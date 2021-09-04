@@ -1,96 +1,108 @@
 #!/bin/bash
 
+#Colors
+normal=$"\e[0m"
+bold=$"\e[1m"
+blink=$"\e[2m"
+green=$"\e[32m"
+orange=$"\e[33m"
+blue=$"\e[94m"
+lightgreen=$"\e[92m"
+lightaqua=$"\e[96m"
+lightpurple=$"\e[105m"
+gray=$"\e[37m"
+
 updateSys () {				# This is a function to update and upgrade your system.
-	echo -e "\033[1m{*} Starting system update process..."
+	echo -e "$lightaqua{*} Starting system update process...$gray"
 	sudo apt update -y && sudo apt upgrade -y
-	echo -e "\033[1m{*} System update process - Finished."
+	echo -e "$orange{*} System update process -$green Finished. $normal"
 	echo "---------------------------------"
 }
 
 getJava () {				# This is a function to install Java
-	echo -e "\033[1m{*} Starting Java 8 install process..."
+	echo -e "$lightaqua{*} Starting Java 8 install process...$gray"
 	sudo apt install openjdk-11-jre-headless -y
-	echo -e "\033[1m{*} Java  8 install process - Finished."
+	echo -e "$orange{*} Java  8 install process -$green Finished. $normal"
 	echo "---------------------------------"
 }
 
 getElastic () {				# This is a function to install and setup Elastic
-	echo -e "\033[1m{*} Starting Elasticsearch install process..."
+	echo -e "$lightaqua{*} Starting Elasticsearch install process...$gray"
 	sleep 1 
 	wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add - 
 	sudo apt-get install apt-transport-https
-	echo " {*} ... adding repository ..."
+	echo -e "$lightaqua{*} ... adding repository ...$gray"
 	sleep 1
 	echo "deb https://artifacts.elastic.co/packages/7.x/apt stable main" | sudo tee /etc/apt/sources.list.d/elastic-7.x.list
-	echo " {*} ... checking for updates ..."
+	echo -e "$lightaqua{*} ... checking for updates ...$gray"
 	sleep 1
 	sudo apt update -y
-	echo " {*} ... installing elasticsearch ..."
+	echo -e "$lightaqua{*} ... installing elasticsearch ...$gray"
 	sleep 1
 	sudo apt install elasticsearch -y
 	echo ""
 	echo " ------------------------------------------------------"
-	echo -e "\033[1m{*} Elasticsearch install process - Finished."
-	echo " {*} Directory for the config file: /etc/elasticsearch "
-	echo " {*} Config file name: elasticsearch.yml"
+	echo -e "$orange{*} Elasticsearch install process -$green Finished. $normal"
+	echo "{*} Directory for the config file: /etc/elasticsearch "
+	echo "{*} Config file name: elasticsearch.yml"
 	echo " ------------------------------------------------------"
 	sleep 1
-	echo -e "\033[1m{*} Configuring config with recommended settings."				# The following should configure the config.
-	echo " {*} Replacing text in config..."	
+	echo -e "$lightaqua{*} Configuring config with recommended settings.$gray"				# The following should configure the config.
+	echo "{*} Replacing text in config..."	
 	sudo sed -i '56s/.*/network.host: localhost/' /etc/elasticsearch/elasticsearch.yml
 	sudo sed -i '61s/.*/http.port: 9200/' /etc/elasticsearch/elasticsearch.yml
-	echo " {*} Replaced."
+	echo -e "$lightaqua{*} Replaced. $normal"
 	echo "---------------------------------"
 }
 
 getKib () {
-	echo -e "\033[1m{*} Starting Kibana install process..."
+	echo -e "$lightaqua{*} Starting Kibana install process...$gray"
 	sleep 1
 	sudo apt install kibana -y
 	echo ""
 	echo "-------------------------------------------------"
-	echo -e "\033[1m{*} Kibina install process - Finished."
-	echo " {*} Directory for config: /etc/kibana"
-	echo " {*} Confige file name: kibana.yml"
+	echo -e "$orange{*} Kibina install process -$green Finished. $normal"
+	echo "{*} Directory for config: /etc/kibana"
+	echo "{*} Confige file name: kibana.yml"
 	echo "-------------------------------------------"
 	sleep 1
-	echo -e "\033[1m{*} Configuring config with recommended settings."				# This will configure the config file..
-	echo " {*} Replacing text in config..."	
+	echo -e "$lightaqua{*} Configuring config with recommended settings.$gray"				# This will configure the config file..
+	echo "{*} Replacing text in config..."	
 	sudo sed -i '2s/.*/server.port: 5601/' /etc/kibana/kibana.yml
 	sudo sed -i '7s/.*/server.host: "localhost"/' /etc/kibana/kibana.yml 
 	sudo sed -i '32s/.*/elasticsearch.hosts: ["http://localhost:9200"]/' /etc/kibana/kibana.yml 
-	echo " {*} Configured."
+	echo -e "$lightaqua{*} Configured. $normal"
 	echo "---------------------------------"
 }
 
 getNginx () {				# This function is to install Nginx and to set it up.
-	echo -e "\033[1m{*} Starting Nginx install process..."
+	echo -e "$lightaqua{*} Starting Nginx install process...$gray"
 	sudo apt install nginx apache2-utils -y
-	echo -e "\033[1m{*} Nginx install process - Finished." 
+	echo -e "$orange{*} Nginx install process -$green Finished. $normal" 
 	sleep 1
 	echo ""
-	echo -e "\033[1m{*} Making kibana destination file for nginx..."
+	echo -e "$lightaqua{*} Making kibana destination file for nginx...$gray"
 	sudo touch /etc/nginx/sites-available kibana
 	echo ""
-	echo -e "\033[1m{*} File created."
-	echo -e "\033[1m{*} Directory for file: /etc/nginx/sites-available"
+	echo -e "$gray File created."
+	echo -e "$gray Directory for file: $green/etc/nginx/sites-available $normal"
 	sleep 1
 
 	echo ""
-	echo -e "\033[1m{*} To avoid possible issues please input a new host name. "
+	echo -e "$lightaqua{*} To avoid possible issues please input a new host name. $gray"
 	read -p 'Hostname: ' hostnamevar
-	echo -e "\033[1m{*} Thank you, new hostname: $hostnamevar"
+	echo -e "$lightaqua{*} Thank you, new hostname: $hostnamevar"
 	echo ""
-	echo -e "\033[1m{*} Changing machines hostname..."
+	echo -e "$lightaqua{*} Changing machines hostname...$gray"
 	sudo echo $hostnamevar > /etc/hostname
-	echo -e "\033[1m{*} Hostname change - Finish."
-	echo -e "\033[1m{*} Adding hostname to system..."
+	echo -e "$orange Hostname change -$green Finish. $normal"
+	echo -e "$lightaqua{*} Adding hostname to system...$gray"
 	usrlocip=$(hostname -i)
 	sudo echo "$userlocip	$hostnamevar" >> /etc/hosts
-	echo -e "\033[1m{*} Hostname has been added."
+	echo -e "$lightaqua{*} Hostname has been added.$normal"
 	
 	echo ""
-	echo -e "\033[1m{*} Configuring the config for nginx..."                										# Start of configuring nginx file at /etc/nginx/sites-available/kibana
+	echo -e "$lightaqua{*} Configuring the config for nginx...$normal"                										# Start of configuring nginx file at /etc/nginx/sites-available/kibana
 	echo "server {" > /etc/nginx/sites-available/kibana
 	echo "	listen 80;" >> /etc/nginx/sites-available/kibana
 	echo "" >> /etc/nginx/sites-available/kibana 
@@ -108,52 +120,52 @@ getNginx () {				# This function is to install Nginx and to set it up.
 	echo "		proxy_cache_bypass \$http_upgrade;" 
 	echo "	}" >> /etc/nginx/sites-available/kibana
 	echo "}" >> /etc/nginx/sites-available/kibana
-	echo -e "\033[1m{*} Done configuring."																		# End of configuring nginx file at /etc/nginx/sites-available/kibana
+	echo -e "$lightaqua{*} Done configuring.$normal"																		# End of configuring nginx file at /etc/nginx/sites-available/kibana
 
 	echo ""
-	echo -e "\033[1m{*} Setting up user account with htpasswd apache command..."
-	read -p ' {*} Please enter username: ' usrvar
-	echo " {*} Thank you, proceeding..."
+	echo -e "$lightaqua{*} Setting up user account with htpasswd apache command...$orange"
+	read -p '{*} Please enter username: ' usrvar
+	echo -e "$lightaqua{*} Thank you, proceeding...$gray"
 	sudo htpasswd -c /etc/nginx/.kibana-user $usrvar
 	echo ""
-	echo -e "\033[1m{*} Setting up user - Finished."
-	echo " {*} Was made at: /etc/nginx/.kibana-user"
+	echo -e "$orange{*} Setting up user -$green Finished.$normal"
+	echo -e "$orange{*} Was made at: /etc/nginx/.kibana-user"
 	sleep 1
 
-	echo -e "\033[1m{*} Setting up link to Kibana config..." 														# The config will be located at /etc/nginx/sites-available directory.
+	echo -e "$lightaqua{*} Setting up link to Kibana config...$gray" 														# The config will be located at /etc/nginx/sites-available directory.
 	sleep 1
 	ln -s /etc/nginx/sites-available/kibana /etc/nginx/sites-enabled/
-	echo -e "\033[1m{*} Link has been made..."
-	echo " {*} Checking if it was made successfully..."
+	echo -e "$orange{*} Link has been made...$gray"
+	echo -e "$orange{*} Checking if it was made successfully...$gray"
 	nginx -t
 	if [ $? -ne 0 ]; then
-		echo -e "\033[1m{*} Did not make successfully, check kibana config in "sites-available" directory."
-	else echo -e "\033[1m{*} Setting up Kibana link - Finished."
+		echo -e "$lightaqua{*} Did not make successfully, check kibana config in "sites-available" directory.$normal"
+	else echo -e "$orange{*} Setting up Kibana link -$green Finished.$normal"
 	fi
 	echo "---------------------------------"
 }
 
 getLogstash () {				# This function is to download Logstash
 	echo ""
-	echo -e "\033[1m{*} Starting logstash install process..."
-	echo " {*} Checking for updates..."
+	echo -e "$lightaqua{*} Starting logstash install process...$gray"
+	echo "{*} Checking for updates..."
 	sudo apt update -y
-	echo " {*} Completed updated check."
+	echo -e "$lightaqua{*} Completed updated check."
 	echo ""
-	echo -e "\033[1m{*} Installing logstash..."
+	echo -e "$lightaqua{*} Installing logstash...$gray"
 	sleep 1
 	sudo apt-get install logstash -y
 	if [ $? -ne 0 ]; then
-		echo " {*} Error downloading logstash."
-	else echo " {*} Logstash install process - Finished."
+		echo -e "$lightaqua{*} Error downloading logstash."
+	else echo -e "$orange{*} Logstash install process -$green Finished.$normal"
 	fi
 	echo "---------------------------------"
 }
 
 startServ () {				# This function will start all of the services that the ELK stack needs
 	echo "" 
-	echo -e "\033[1m{*} Enabling Services for start on boot."
-	echo " {*} Starting Elastic, Kibana, Nginx, Logstash Services..."
+	echo -e "$lightaqua{*} Enabling Services for start on boot.$gray"
+	echo "{*} Starting Elastic, Kibana, Nginx, Logstash Services..."
 	sudo /bin/systemctl -q daemon-reload
 	sudo /bin/systemctl -q enable elasticsearch
 	sudo /bin/systemctl -q enable kibana
@@ -163,15 +175,13 @@ startServ () {				# This function will start all of the services that the ELK st
 	sudo /bin/systemctl -q start kibana
 	sudo /bin/systemctl -q start nginx
 	sudo /bin/systemctl -q start logstash
-	echo " {*} All Services started."
+	echo -e "$orange{*} All Services started.$normal"
 	echo "---------------------------------"
 }
 
 checkServ () {				# This function will check the status of the services that the ELK stack uses
 	echo ""
-	echo -e "\033[1m{*} Started and enabled the Services."
-	echo ""
-	echo -e "\033[1m{*} Checking Service status: "
+	echo -e "$lightaqua{*} Checking Service status: $gray"
 
 	/bin/systemctl is-active -q elasticsearch && echo " {*} Elasticsearch is running woo! Better go catch it!" || echo " {*} Elasticsearch is not running... aww."
 	/bin/systemctl is-active -q kibana && echo " {*} Kibana is running woo! Better go catch it!" || echo " {*} Kibana is not running... aww."
@@ -179,14 +189,14 @@ checkServ () {				# This function will check the status of the services that the
 	/bin/systemctl is-active -q logstash && echo " {*} Logstash is running woo! Better go catch it!" || echo " {*} Logstash is not running...aww."
 
 	echo ""
-	echo -e "\033[1m{*} Checking Service status - Finished."
+	echo -e "$orange{*} Checking Service status -$green Finished.$normal"
 	echo "---------------------------------"
 }
 
 while true; do
-	sleep 5
+	sleep 2
 	clear
-	echo ""
+	echo -e "$lightgreen"
 	echo "  .-------------------------------------------------------------------------------. "   # Made By Jared Kell	
         echo " | .-----------------------------------------------------------------------------. |"   # 9/3/2021
 	echo " | |                                                                 		 | |"
@@ -197,14 +207,14 @@ while true; do
         echo " | |                                                    			 | |"
 	echo " | |										 | |"
         echo " | |                                                                             | |"    
-	echo " | | {*} $(date)                                         | |"
+	echo " | | {*} $(date)                                           | |"
 	echo " | | {*} Starting the ELKsavior process.           	                         | |"
 	echo " | | {*} This should work on most Debian-based Systems				 | |"
 	echo " | | {*} This will install ELasticsearch - Kibana - Nginx - Logstash             | |"
 	echo " | |             								 | |"
 	echo " | '-----------------------------------------------------------------------------' |"
 	echo "  '-------------------------------------------------------------------------------'"
-	echo ""
+	echo -e "$normal$gray"
 	PS3="Please select one of the following: "
 
 	choices=("Update System" "Install Java" "Install Kibana" "Install Nginx" "Install Logstash" "Start Services" "Check Services" "Quit")
