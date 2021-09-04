@@ -2,14 +2,10 @@
 
 #Colors
 normal=$"\e[0m"
-bold=$"\e[1m"
-blink=$"\e[2m"
 green=$"\e[32m"
 orange=$"\e[33m"
-blue=$"\e[94m"
 lightgreen=$"\e[92m"
 lightaqua=$"\e[96m"
-lightpurple=$"\e[105m"
 gray=$"\e[37m"
 
 updateSys () {				# This is a function to update and upgrade your system.
