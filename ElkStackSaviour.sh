@@ -66,7 +66,7 @@ getKib () {
 	echo "{*} Replacing text in config..."	
 	sudo sed -i '2s/.*/server.port: 5601/' /etc/kibana/kibana.yml
 	sudo sed -i '7s/.*/server.host: "localhost"/' /etc/kibana/kibana.yml 
-	sudo sed -i '32s/.*/elasticsearch.hosts: ["http://localhost:9200"]/' /etc/kibana/kibana.yml 
+	sudo sed -i '32s,.*,elasticsearch.hosts: ["http://localhost:9200"],' /etc/kibana/kibana.yml 
 	echo -e "$lightaqua{*} Configured. $normal"
 	echo "---------------------------------"
 }
@@ -94,7 +94,7 @@ getNginx () {				# This function is to install Nginx and to set it up.
 	echo -e "$orange Hostname change -$green Finish. $normal"
 	echo -e "$lightaqua{*} Adding hostname to system...$gray"
 	usrlocip=$(hostname -i)
-	sudo echo "$userlocip	$hostnamevar" >> /etc/hosts
+	sudo echo "$usrlocip	$hostnamevar" >> /etc/hosts
 	echo -e "$lightaqua{*} Hostname has been added.$normal"
 	
 	echo ""
@@ -102,7 +102,7 @@ getNginx () {				# This function is to install Nginx and to set it up.
 	echo "server {" > /etc/nginx/sites-available/kibana
 	echo "	listen 80;" >> /etc/nginx/sites-available/kibana
 	echo "" >> /etc/nginx/sites-available/kibana 
-	echo "	server_name "$hostnamevar";" 
+	echo "	server_name "$hostnamevar";" >> /etc/nginx/sites-available/kibana
 	echo "" >> /etc/nginx/sites-available/kibana
 	echo "	auth_basic \"Restricted Access\";" >> /etc/nginx/sites-available/kibana
 	echo "	auth_basic_user_file /etc/nginx/.kibana-user;" >> /etc/nginx/sites-available/kibana
@@ -110,10 +110,10 @@ getNginx () {				# This function is to install Nginx and to set it up.
 	echo "	location / {" >> /etc/nginx/sites-available/kibana
 	echo "		proxy_pass http://localhost:5601;" >> /etc/nginx/sites-available/kibana
 	echo "		proxy_http_version 1.1;" >> /etc/nginx/sites-available/kibana
-	echo "		proxy_set_header Upgrade \$http_upgrade;" 
+	echo "		proxy_set_header Upgrade \$http_upgrade;" >> /etc/nginx/sites-available/kibana
 	echo "		proxy_set_header Connection 'upgrade';" >> /etc/nginx/sites-available/kibana
-	echo "		proxy_set_header Host \$host;" 
-	echo "		proxy_cache_bypass \$http_upgrade;" 
+	echo "		proxy_set_header Host \$host;" >> /etc/nginx/sites-available/kibana
+	echo "		proxy_cache_bypass \$http_upgrade;" >> /etc/nginx/sites-available/kibana
 	echo "	}" >> /etc/nginx/sites-available/kibana
 	echo "}" >> /etc/nginx/sites-available/kibana
 	echo -e "$lightaqua{*} Done configuring.$normal"																		# End of configuring nginx file at /etc/nginx/sites-available/kibana
@@ -213,7 +213,7 @@ while true; do
 	echo -e "$normal$gray"
 	PS3="Please select one of the following: "
 
-	choices=("Update System" "Install Java" "Install Kibana" "Install Nginx" "Install Logstash" "Start Services" "Check Services" "Quit")
+	choices=("Update System" "Install Java" "Install Elastic" "Install Kibana" "Install Nginx" "Install Logstash" "Start Services" "Check Services" "Quit")
 	select usrchoice in "${choices[@]}"; do
 
 		case $usrchoice in
@@ -222,6 +222,9 @@ while true; do
 				break;;
 			"Install Java")
 				getJava
+				break;;
+			"Install Elastic")
+				getElastic
 				break;;
 			"Install Kibana")
 				getKib
